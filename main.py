@@ -6,14 +6,18 @@ pygame.font.init()
 
 '''TIC TAC TOE'''
 BLACK = (0, 0, 0)
-WHITE = (255, 0, 0)
+WHITE = (255, 255, 255)
+BLUE = (54, 130, 189)
+SCORE_BLUE = (30, 69, 136)
+PURPLE = (164, 31, 102)
 RAND = (33, 49, 29)
 WIDTH, HEIGHT = 600, 600
 CLOCK = pygame.time.Clock()
+pygame.display.set_caption("TIC TAC TOE")
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 '''Pygame mouse detection'''
 score_font = pygame.font.SysFont('comicsans', 45)
-x_o_font = pygame.font.SysFont('comicsans', 260)
+x_o_font = pygame.font.Font('PressStart2P-Regular.ttf', 140)
 squareNet = [pygame.Rect(60, 20, 160, 160), pygame.Rect(220, 20, 160, 160), pygame.Rect(380, 20, 160, 160), pygame.Rect(60, 180, 160, 160), pygame.Rect(
     220, 180, 160, 160), pygame.Rect(380, 180, 160, 160), pygame.Rect(60, 340, 160, 160), pygame.Rect(220, 340, 160, 160), pygame.Rect(380, 340, 160, 160)]
 gameBoard = {0: ' ', 1: ' ', 2: ' ', 3: ' ',
@@ -31,15 +35,15 @@ def emptyGameBoard():
 
 def drawSquares():
     for i in squareNet:
-        pygame.draw.rect(WIN, RAND, i, 2)
+        pygame.draw.rect(WIN, WHITE, i, 4)
 
 
 def drawX():
-    x_render = x_o_font.render('X', False, WHITE)
+    x_render = x_o_font.render('X', False, BLUE)
 
     for key, val in gameBoard.items():
         if val == 'X':
-            WIN.blit(x_render, (squareNet[key].x+20, squareNet[key].y))
+            WIN.blit(x_render, (squareNet[key].x+20, squareNet[key].y+17))
             '''pygame.draw.line(WIN, WHITE, (squareNet[key].x + 5, squareNet[key].y + 5),
                              (squareNet[key].x + 155, squareNet[key].y + 155), 6)
             pygame.draw.line(
@@ -56,10 +60,10 @@ def itsDraw():
 
 
 def drawO():
-    o_render = x_o_font.render('O', False, WHITE)
+    o_render = x_o_font.render('O', False, PURPLE)
     for key, val in gameBoard.items():
         if val == 'O':
-            WIN.blit(o_render, (squareNet[key].x+10, squareNet[key].y))
+            WIN.blit(o_render, (squareNet[key].x+20, squareNet[key].y+17))
             '''pygame.draw.circle(
                 WIN, WHITE, (squareNet[key].x+80, squareNet[key].y+80), 80, 6)'''
 
@@ -84,7 +88,9 @@ def checkWin():
         if trial.count('X') == 3 or trial.count('O') == 3:
             if trial[0] == 'X':
                 x_score += 1
-                time.sleep(.1)
+                start_pos = (squareNet[vertical].x, squareNet[vertical].y)
+                end_pos = (squareNet[vertical+6].x, squareNet[vertical+6].y)
+                pygame.draw.line(WIN, WHITE, start_pos, end_pos, 2)
                 emptyGameBoard()
             else:
                 o_score += 1
@@ -94,8 +100,10 @@ def checkWin():
     diagonal = [gameBoard[0], gameBoard[4], gameBoard[8]]
     if diagonal.count('X') == 3 or diagonal.count('O') == 3:
         if diagonal[0] == 'X':
+            pygame.draw.line(
+                WIN, WHITE, (squareNet[0].x, squareNet[0].y), (squareNet[8].x+160, squareNet[8].y+160), 4)
             x_score += 1
-            time.sleep(.1)
+            pygame.time.delay(100)
             emptyGameBoard()
         else:
             o_score += 1
@@ -106,7 +114,9 @@ def checkWin():
     if reverse_diagonal.count('X') == 3 or reverse_diagonal.count('O') == 3:
         if reverse_diagonal[0] == 'X':
             x_score += 1
-            time.sleep(.1)
+            pygame.draw.line(
+                WIN, WHITE, (squareNet[2].x+160, squareNet[2].y), (squareNet[6].x, squareNet[6].y+160), 2)
+            time.sleep(2)
             emptyGameBoard()
         else:
             o_score += 1
@@ -173,8 +183,8 @@ def reverseDiagonalCheck():
 
 
 def drawScore():
-    x_score_render = score_font.render(f'X: {x_score}', False, WHITE)
-    o_score_render = score_font.render(f'O: {o_score}', False, WHITE)
+    x_score_render = score_font.render(f'X: {x_score}', False, BLUE)
+    o_score_render = score_font.render(f'O: {o_score}', False, PURPLE)
     WIN.blit(x_score_render, (WIDTH//2-80, HEIGHT - 60))
     WIN.blit(o_score_render, (WIDTH//2+20, HEIGHT - 60))
 
