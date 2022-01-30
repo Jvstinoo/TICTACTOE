@@ -41,18 +41,15 @@ def drawSquares():
         pygame.draw.rect(WIN, WHITE, i, 4)
 
 
-def drawX():
+def drawXAndO():
     x_render = x_o_font.render('X', False, BLUE)
-
+    o_render = x_o_font.render('O', False, PURPLE)
+    
     for key, val in gameBoard.items():
         if val == 'X':
             WIN.blit(x_render, (squareNet[key].x+20, squareNet[key].y+17))
-            '''pygame.draw.line(WIN, WHITE, (squareNet[key].x + 5, squareNet[key].y + 5),
-                             (squareNet[key].x + 155, squareNet[key].y + 155), 6)
-            pygame.draw.line(
-                WIN, WHITE, (squareNet[key].x + 155, squareNet[key].y+5), (squareNet[key].x+5, squareNet[key].y+155), 6)
-'''
-
+        else:
+            WIN.blit(o_render, (squareNet[key].x+20, squareNet[key].y+17))
 
 def itsDraw():
     global x_turn, o_turn
@@ -60,16 +57,12 @@ def itsDraw():
         emptyGameBoard()
         x_turn = 0
         o_turn = 0
+        
+def getXCount(dic):
+    return list(dic.values()).count('X')
 
-
-def drawO():
-    o_render = x_o_font.render('O', False, PURPLE)
-    for key, val in gameBoard.items():
-        if val == 'O':
-            WIN.blit(o_render, (squareNet[key].x+20, squareNet[key].y+17))
-            '''pygame.draw.circle(
-                WIN, WHITE, (squareNet[key].x+80, squareNet[key].y+80), 80, 6)'''
-
+def getOCount(dic):
+    return list(dic.values()).count('O')
 
 def checkWin():
     global x_score, o_score, event_timer, current_time, flag_win, won
@@ -77,7 +70,6 @@ def checkWin():
     for horizontal in range(0, len(gameBoard), 3):
         trial = list(gameBoard.values())[horizontal:horizontal+3]
         if trial.count('X') == 3 or trial.count('O') == 3:
-
             won = True
             return squareNet[horizontal], squareNet[horizontal+3], squareNet[horizontal], 'Horizontal'
 
@@ -98,63 +90,55 @@ def checkWin():
         won = True
         return squareNet[2], squareNet[6], gameBoard[2], 'Rev_Diagonal'
 
-
 def AI():
     global x_turn, o_turn
-    if x_turn-o_turn == 1:
+    if x_turn-o_turn == 1 and not won:
         for key, val in gameBoard.items():
             if val == ' ':
                 gameBoard[key] = 'O'
                 o_turn += 1
                 break
 
-
-def getXCount(dic):
-    return list(dic.values()).count('X')
-
-
-def getOCount(dic):
-    return list(dic.values()).count('O')
-
-
 def chosenSpot(dic):
     vals = list(dic.values())
     keys = list(dic.keys())
     return keys[vals.index(' ')]
 
-
 def horizontalCheck():
     global x_turn, o_turn
-    for i in range(0, len(gameBoard), 3):
-        hor = {i: gameBoard[i], i+1: gameBoard[i+1], i+2: gameBoard[i+2]}
-        if getXCount(hor) > 1 and getOCount(hor) < 1 and (x_turn-o_turn == 1) and not won:
-            gameBoard[chosenSpot(hor)] = 'O'
-            o_turn += 1
-
+    if x_turn-o_turn == 1:
+        for i in range(0, len(gameBoard), 3):
+            hor = {i: gameBoard[i], i+1: gameBoard[i+1], i+2: gameBoard[i+2]}
+            if getXCount(hor) > 1 and getOCount(hor) < 1  and not won:
+                gameBoard[chosenSpot(hor)] = 'O'
+                o_turn += 1
 
 def verticalCheck():
     global x_turn, o_turn
-    for i in range(0, 3):
-        vert = {i: gameBoard[i], i+3: gameBoard[i+3], i+6: gameBoard[i+6]}
-        if getXCount(vert) > 1 and getOCount(vert) < 1 and (x_turn-o_turn == 1) and not won:
-            gameBoard[chosenSpot(vert)] = 'O'
-            o_turn += 1
+    if x_turn-o_turn == 1:
+        for i in range(0, 3):
+            vert = {i: gameBoard[i], i+3: gameBoard[i+3], i+6: gameBoard[i+6]}
+            if getXCount(vert) > 1 and getOCount(vert) < 1 and not won:
+                gameBoard[chosenSpot(vert)] = 'O'
+                o_turn += 1
 
 
 def diagonalCheck():
     global x_turn, o_turn
-    diag = {0: gameBoard[0], 4: gameBoard[4], 8: gameBoard[8]}
-    if getXCount(diag) > 1 and getOCount(diag) < 1 and (x_turn-o_turn == 1) and not won:
-        gameBoard[chosenSpot(diag)] = 'O'
-        o_turn += 1
+    if x_turn-o_turn == 1:
+        diag = {0: gameBoard[0], 4: gameBoard[4], 8: gameBoard[8]}
+        if getXCount(diag) > 1 and getOCount(diag) < 1 and not won:
+            gameBoard[chosenSpot(diag)] = 'O'
+            o_turn += 1
 
 
 def reverseDiagonalCheck():
     global x_turn, o_turn
-    rev_diag = {2: gameBoard[2], 4: gameBoard[4], 6: gameBoard[6]}
-    if getXCount(rev_diag) > 1 and getOCount(rev_diag) < 1 and (x_turn-o_turn == 1) and not won:
-        gameBoard[chosenSpot(rev_diag)] = 'O'
-        o_turn += 1
+    if x_turn-o_turn == 1:
+        rev_diag = {2: gameBoard[2], 4: gameBoard[4], 6: gameBoard[6]}
+        if getXCount(rev_diag) > 1 and getOCount(rev_diag) < 1 and not won:
+            gameBoard[chosenSpot(rev_diag)] = 'O'
+            o_turn += 1
 
 
 def drawScore():
@@ -209,12 +193,12 @@ while running:
         won = False
     # current_time = pygame.time.get_ticks()
     if event_timer > 6000:
+        event_timer = 0
         emptyGameBoard()
         if winning_side == 'X':
             x_score += 1
         else:
             o_score += 1
-        event_timer = 0
     print(event_timer)
 
     for event in pygame.event.get():
