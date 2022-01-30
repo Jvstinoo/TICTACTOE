@@ -1,6 +1,5 @@
 from threading import currentThread
 import time
-from numpy import square
 import pygame
 from pygame.locals import *
 pygame.init()
@@ -19,8 +18,7 @@ pygame.display.set_caption("TIC TAC TOE")
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 '''Pygame mouse detection'''
 score_font = pygame.font.SysFont('comicsans', 45)
-current_time = 0
-event_timer = 0
+
 x_o_font = pygame.font.Font('PressStart2P-Regular.ttf', 140)
 squareNet = [pygame.Rect(60, 20, 160, 160), pygame.Rect(220, 20, 160, 160), pygame.Rect(380, 20, 160, 160), pygame.Rect(60, 180, 160, 160), pygame.Rect(
     220, 180, 160, 160), pygame.Rect(380, 180, 160, 160), pygame.Rect(60, 340, 160, 160), pygame.Rect(220, 340, 160, 160), pygame.Rect(380, 340, 160, 160)]
@@ -169,7 +167,7 @@ def drawScore():
 running = True
 while running:
     WIN.fill(BLACK)
-
+    event_timer = 0
     mx, my = pygame.mouse.get_pos()
     for j in range(len(squareNet)):
         if squareNet[j].collidepoint((mx, my)) and pygame.mouse.get_pressed()[0]:
@@ -177,7 +175,6 @@ while running:
                 gameBoard[j] = 'X'
                 x_turn += 1
     checkWin()
-    itsDraw()
     drawSquares()
     drawScore()
     horizontalCheck()
@@ -188,10 +185,13 @@ while running:
 
     drawX()
     drawO()
+    itsDraw()
+
     winning_side = ''
     if won:
         win_details = checkWin()
         winning_side = checkWin()[2]
+        event_timer = pygame.time.get_ticks()
         if win_details[-1] == 'Diagonal':
             pygame.draw.line(
                 WIN, WHITE, (win_details[0].x, win_details[0].y), (win_details[1].x+160, win_details[1].y+160), 8)
@@ -206,7 +206,6 @@ while running:
         if win_details[-1] == 'Horizontal':
             pygame.draw.line(
                 WIN, WHITE, (win_details[0].x, win_details[0].y+80), (win_details[1].x+160, win_details[1].y+80), 4)
-        event_timer = pygame.time.get_ticks()
         won = False
     # current_time = pygame.time.get_ticks()
     if event_timer > 6000:
@@ -216,8 +215,7 @@ while running:
         else:
             o_score += 1
         event_timer = 0
-
-    print(current_time, event_timer)
+    print(event_timer)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
